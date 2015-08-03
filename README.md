@@ -124,11 +124,17 @@ To add a Text Translation mapping, click the 'Create an entity' button on the up
 ---
 When everything is changed correctly, you can deploy the application on the GAE in Eclipse. Right click on the project in Eclipse and navigate to: Google>Deploy to App Engine. When deployed, a new window appears in your browser. Click on the 'OAuth2' link and give permission to get access to your account. When done so, you can click on the 'Captions' link, when visiting your application on the GAE. If you ever receive a 'no credits' message when clicking on the 'Captions' link, you need to run the 'OAuth2' part again.
 
+## License
+---
+This application is released under the terms of the license specified in the project's repository or if not specified, under the [MIT license](https://tldrlegal.com/license/mit-license).
+
+The MIT License is simple and easy to understand and it places almost no restrictions on what you can do with this application.
+
+You are free to use any part of this source code in any other project (even commercial projects) as long as the copyright header is left intact.
+
+
 ## Credits
 ---
 This application was made for the [MuseScore project](https://github.com/musescore).
 
 A big thumbs up to Transifex for making their services available to [open source projects](https://www.transifex.com/customers/open-source/)!
-
-## License
----
