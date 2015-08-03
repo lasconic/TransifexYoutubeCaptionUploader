@@ -123,3 +123,12 @@ To add a Text Translation mapping, click the 'Create an entity' button on the up
 ## Running the app for the first time
 ---
 When everything is changed correctly, you can deploy the application on the GAE in Eclipse. Right click on the project in Eclipse and navigate to: Google>Deploy to App Engine. When deployed, a new window appears in your browser. Click on the 'OAuth2' link and give permission to get access to your account. When done so, you can click on the 'Captions' link, when visiting your application on the GAE. If you ever receive a 'no credits' message when clicking on the 'Captions' link, you need to run the 'OAuth2' part again.
+
+## Credits
+---
+This application was made for the [MuseScore project](https://github.com/musescore).
+
+A big thumbs up to Transifex for making their services available to [open source projects](https://www.transifex.com/customers/open-source/)!
+
+## License
+---
