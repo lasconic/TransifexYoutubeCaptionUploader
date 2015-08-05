@@ -204,25 +204,36 @@ public class CaptionsServlet extends HttpServlet {
 					//Get all the captions that need an update
 					List<String> languages = transifex.getDepricatedLanguages(slug, lastRuntime);
 					for(String code : languages){
-						//Get the captioncontent
-						String caption = transifex.getCaption(slug, code);
 						
-						//Check if language already exists; if so: update, if not: upload
-						String videoID = urlMap.get(slug);
-						String captionID = this.getCaptionID(videoID, code);
-						if(captionID == null){
-							//upload method
-							resp.getWriter().println("\t - Uploading language: " + code + " on videoID: " + urlMap.get(slug));
-							this.uploadCaption(videoID, code, "", caption);
-						} else {
-							//update method
-							resp.getWriter().println("\t - Updating language: " + code + " on videoID: " + urlMap.get(slug));
-							this.updateCaption(captionID, caption);
+						//Check if language is uploaded yet
+						Date lastDateLanguage = getLastDate(slug, code);
+						resp.getWriter().println("\t - language: " + lastDateLanguage + " - resource " + lastRuntime);
+						if((lastRuntime == null && lastDateLanguage == null) || (lastRuntime != null && lastDateLanguage.after(lastRuntime))) {
+
+							//Get the captioncontent
+							String caption = transifex.getCaption(slug, code);
+							
+							//Check if language already exists; if so: update, if not: upload
+							String videoID = urlMap.get(slug);
+							String captionID = this.getCaptionID(videoID, code);
+							if(captionID == null){
+								//upload method
+								resp.getWriter().println("\t - Uploading language: " + code + " on videoID: " + urlMap.get(slug));
+								this.uploadCaption(videoID, code, "", caption);
+							} else {
+								//update method
+								resp.getWriter().println("\t - Updating language: " + code + " on videoID: " + urlMap.get(slug));
+								this.updateCaption(captionID, caption);
+							}
+							//Save language update time into the datastore
+							Entity e = new Entity(slug, code);
+							e.setProperty("date", thisDate);
+							datastore.put(e);
 				    	}
 						
 						
 					}
-					//Save date in datestore
+					//Save Resource update time into the datestore
 					Entity e = new Entity("lastRuntime", slug);
 					e.setProperty("date", thisDate);
 					datastore.put(e);			
@@ -245,6 +256,7 @@ public class CaptionsServlet extends HttpServlet {
 		resp.getWriter().println("An error occured");
 	}
 	
+	//Get last update time from a specific resource
 	private Date getLastDate(String resourceSlug){
 		try {
 			DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -260,6 +272,22 @@ public class CaptionsServlet extends HttpServlet {
 		}
 	}
 
+	//Get last update time from a specific language of a resource
+	private Date getLastDate(String resourceSlug, String languageCode){
+		try {
+			DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+			Key key = KeyFactory.createKey(resourceSlug, languageCode);
+			Entity e = datastore.get(key);
+			String date = (String)e.getProperty("date");
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+            return df.parse(date);
+		} catch (EntityNotFoundException e) {
+			return null;
+		} catch (ParseException e){
+			return null;
+		}
+	}
+	
 	//gets the captionID
 	private String getCaptionID(String videoID, String captionLanguage) throws IOException {
     	CaptionListResponse captionListResponse = youtube.captions().
