@@ -17,29 +17,29 @@
   "canonicalName": "YouTube", 
   "files": [
     {
-      "downloadUrl": "/downloads/youtube/v3/142/java/1.18.0-rc/google-api-services-youtube-v3-rev142-1.18.0-rc.jar", 
-      "path": "google-api-services-youtube-v3-rev142-1.18.0-rc.jar", 
+      "downloadUrl": "/downloads/youtube/v3/143/java/1.18.0-rc/google-api-services-youtube-v3-rev143-1.18.0-rc.jar", 
+      "path": "google-api-services-youtube-v3-rev143-1.18.0-rc.jar", 
       "type": "binary", 
-      "timestamp": "2015-07-10 04:08"
+      "timestamp": "2015-07-31 03:05"
     }, 
     {
-      "downloadUrl": "/downloads/youtube/v3/142/java/1.18.0-rc/google-api-services-youtube-v3-rev142-1.18.0-rc-javadoc.jar", 
-      "path": "google-api-services-youtube-v3-rev142-1.18.0-rc-javadoc.jar", 
+      "downloadUrl": "/downloads/youtube/v3/143/java/1.18.0-rc/google-api-services-youtube-v3-rev143-1.18.0-rc-javadoc.jar", 
+      "path": "google-api-services-youtube-v3-rev143-1.18.0-rc-javadoc.jar", 
       "type": "documentation", 
-      "timestamp": "2015-07-10 04:08"
+      "timestamp": "2015-07-31 03:06"
     }, 
     {
-      "downloadUrl": "/downloads/youtube/v3/142/java/1.18.0-rc/google-api-services-youtube-v3-rev142-1.18.0-rc-sources.jar", 
-      "path": "google-api-services-youtube-v3-rev142-1.18.0-rc-sources.jar", 
+      "downloadUrl": "/downloads/youtube/v3/143/java/1.18.0-rc/google-api-services-youtube-v3-rev143-1.18.0-rc-sources.jar", 
+      "path": "google-api-services-youtube-v3-rev143-1.18.0-rc-sources.jar", 
       "type": "source", 
-      "timestamp": "2015-07-10 04:50"
+      "timestamp": "2015-07-31 03:48"
     }, 
     {
-      "path": "google-api-services-youtube-v3-rev142-1.18.0-rc.jar.properties", 
+      "path": "google-api-services-youtube-v3-rev143-1.18.0-rc.jar.properties", 
       "type": "android.properties"
     }
   ], 
-  "revision": 142, 
+  "revision": 143, 
   "language": "java", 
   "language_version": "1.18.0-rc", 
   "dependencies": [

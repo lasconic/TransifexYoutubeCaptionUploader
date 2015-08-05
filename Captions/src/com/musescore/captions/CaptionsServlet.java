@@ -25,8 +25,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONException;
-
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.media.MediaHttpUploader;
@@ -148,8 +146,6 @@ public class CaptionsServlet extends HttpServlet {
 				Transport.send(msg);
 				
 			}
-		} catch (JSONException e){
-			e.printStackTrace();
 		} catch (MessagingException e){
 			e.printStackTrace();
 		}
@@ -158,7 +154,7 @@ public class CaptionsServlet extends HttpServlet {
 	//Update all captions
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		resp.setContentType("text/plain");
-
+		
 		try {
 			// Load client secrets.
 			Reader clientSecretReader = new InputStreamReader(getServletContext().getResourceAsStream("/client_secrets.json"));
@@ -197,21 +193,15 @@ public class CaptionsServlet extends HttpServlet {
 	    	dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 	    	String thisDate = dateFormat.format(new Date());
 			resp.getWriter().println("Date now (Transifex Time): " + thisDate.toString());
-
-			//Get last runtime date from datastore
-			Date lastRuntime = getLastDate();
-			if (lastRuntime != null) {
-				resp.getWriter().println("Script last ran on: " + lastRuntime.toString());
-			} else {
-				resp.getWriter().println("Script last ran on: null");
-			}
-			resp.getWriter().println();
 			
 			Transifex transifex = new Transifex(this.projectSlug, this.auth);
 			List<String> resourceSlugs = transifex.getAllResourceSlugs();
 			for(String slug : resourceSlugs){
 				if(urlMap.containsKey(slug)){
 					resp.getWriter().println("===== Checking resource: " + slug + " =====");
+					//Get last runtime date for the resource
+					Date lastRuntime = getLastDate(slug);
+					//Get all the captions that need an update
 					List<String> languages = transifex.getDepricatedLanguages(slug, lastRuntime);
 					for(String code : languages){
 						//Get the captioncontent
@@ -232,24 +222,18 @@ public class CaptionsServlet extends HttpServlet {
 						
 						
 					}
+					//Save date in datestore
+					Entity e = new Entity("lastRuntime", slug);
+					e.setProperty("date", thisDate);
+					datastore.put(e);			
+					resp.getWriter().println("-> Updated last runtime in datastore");
 				}
 			}
 	
-			resp.getWriter().println("Upload DONE !");
-			
-			//Save date in datestore
-			Entity e = new Entity("lastRuntime", "0");
-			e.setProperty("date", thisDate);
-			datastore.put(e);			
-			resp.getWriter().println("Updated last runtime in datastore");
-			
+			resp.getWriter().println("Upload DONE !");			
 			return;
 		} catch (ParseException e) {
 			resp.getWriter().println("ParseException");
-			resp.getWriter().println(e.getMessage());
-			e.printStackTrace();
-		} catch (JSONException e) {
-			resp.getWriter().println("JSONException");
 			resp.getWriter().println(e.getMessage());
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -261,11 +245,10 @@ public class CaptionsServlet extends HttpServlet {
 		resp.getWriter().println("An error occured");
 	}
 	
-	private Date getLastDate(){
+	private Date getLastDate(String resourceSlug){
 		try {
 			DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-			Key key = KeyFactory.createKey("lastRuntime", "0");
-			
+			Key key = KeyFactory.createKey("lastRuntime", resourceSlug);
 			Entity e = datastore.get(key);
 			String date = (String)e.getProperty("date");
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
