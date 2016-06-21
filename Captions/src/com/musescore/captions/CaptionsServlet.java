@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
+import java.util.logging.Logger;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -53,12 +54,9 @@ public class CaptionsServlet extends HttpServlet {
 
 	// Define a global instance of the HTTP transport.
 	public static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
+	private static final Logger log = Logger.getLogger(CaptionsServlet.class.getName());
 
 	private static YouTube youtube;
-	
-	//Transifex details
-	private String projectSlug = "";
-	private String auth = ""; //in form: username:password
 	
 	private Map<String, String> urlMap = new HashMap<String, String>();
 	
@@ -66,7 +64,7 @@ public class CaptionsServlet extends HttpServlet {
 	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		try {
 
-			if(req.getParameter("project").equals(projectSlug)){
+			if(req.getParameter("project").equals(Config.TRANSIFEX_PROJECT_SLUG)){
 				String resource = req.getParameter("resource");
 				String code = req.getParameter("language");
 				
@@ -98,8 +96,7 @@ public class CaptionsServlet extends HttpServlet {
 					urlMap.put(slug, id);
 				}
 				
-				Transifex transifex = new Transifex(this.projectSlug, this.auth);
-				
+				Transifex transifex = new Transifex(Config.TRANSIFEX_PROJECT_SLUG, Config.TRANSIFEX_AUTH);		
 				//Putting caption on youtube
 				if(urlMap.containsKey(resource)){
 					String caption = transifex.getCaption(resource, code);
@@ -109,10 +106,10 @@ public class CaptionsServlet extends HttpServlet {
 					String captionID = this.getCaptionID(videoID, code);
 					if(captionID == null){
 						//upload method
-						this.uploadCaption(videoID, code, "", caption);
+						uploadCaption(videoID, code, "", caption);
 					} else {
 						//update method
-						this.updateCaption(captionID, caption);
+						updateCaption(captionID, caption);
 			    	}
 				} else {
 					return;
@@ -120,7 +117,7 @@ public class CaptionsServlet extends HttpServlet {
 			
 				//Sending mail with all translations
 				//
-				//Geting translations
+				//Getting translations
 				gaeQuery = new Query("TextTranslation");
 				pq = datastore.prepare(gaeQuery);
 				list = pq.asList(FetchOptions.Builder.withDefaults());
@@ -138,9 +135,9 @@ public class CaptionsServlet extends HttpServlet {
 				Properties props = new Properties();
 				Session session = Session.getDefaultInstance(props, null);
 				Message msg = new MimeMessage(session);
-				msg.setFrom(new InternetAddress("YOUR_GMAIL", "NAME_SENDER"));
+				msg.setFrom(new InternetAddress("musescore.donation@gmail.com", "Transifex to Youtube"));
 				msg.addRecipient(Message.RecipientType.TO,
-					  new InternetAddress("EMAIL_RECEIVER", "NAME_RECEIVER"));
+					  new InternetAddress("thomas@musescore.com", "Thomas"));
 				msg.setSubject("A new translation is completed");
 				msg.setText(msgBody);
 				Transport.send(msg);
@@ -194,23 +191,23 @@ public class CaptionsServlet extends HttpServlet {
 	    	String thisDate = dateFormat.format(new Date());
 			resp.getWriter().println("Date now (Transifex Time): " + thisDate.toString());
 			
-			Transifex transifex = new Transifex(this.projectSlug, this.auth);
+			Transifex transifex = new Transifex(Config.TRANSIFEX_PROJECT_SLUG, Config.TRANSIFEX_AUTH);
 			List<String> resourceSlugs = transifex.getAllResourceSlugs();
 			for(String slug : resourceSlugs){
 				if(urlMap.containsKey(slug)){
 					resp.getWriter().println("===== Checking resource: " + slug + " =====");
+					log.warning("===== Checking resource: " + slug + " =====");
 					//Get last runtime date for the resource
 					Date lastRuntime = getLastDate(slug);
 					//Get all the captions that need an update
 					List<String> languages = transifex.getDepricatedLanguages(slug, lastRuntime);
 					for(String code : languages){
-						
 						//Check if language is uploaded yet
 						Date lastDateLanguage = getLastDate(slug, code);
-						resp.getWriter().println("\t - language: " + lastDateLanguage + " - resource " + lastRuntime);
-						if((lastRuntime == null && lastDateLanguage == null) || (lastRuntime != null && lastDateLanguage.after(lastRuntime))) {
+						resp.getWriter().println("\t - language: " + code + " - lastDatelang :" + lastDateLanguage + " - lastDate resource " + lastRuntime);
+						if(lastRuntime == null  || lastDateLanguage == null || (lastRuntime != null && lastDateLanguage != null && lastDateLanguage.after(lastRuntime))) {
 
-							//Get the captioncontent
+							//Get the caption content
 							String caption = transifex.getCaption(slug, code);
 							
 							//Check if language already exists; if so: update, if not: upload
@@ -219,19 +216,19 @@ public class CaptionsServlet extends HttpServlet {
 							if(captionID == null){
 								//upload method
 								resp.getWriter().println("\t - Uploading language: " + code + " on videoID: " + urlMap.get(slug));
+								log.warning("Uploading language: " + code + " on videoID: " + urlMap.get(slug));
 								this.uploadCaption(videoID, code, "", caption);
 							} else {
 								//update method
 								resp.getWriter().println("\t - Updating language: " + code + " on videoID: " + urlMap.get(slug));
+								log.warning("Updating language: " + code + " on videoID: " + urlMap.get(slug));
 								this.updateCaption(captionID, caption);
 							}
 							//Save language update time into the datastore
 							Entity e = new Entity(slug, code);
 							e.setProperty("date", thisDate);
 							datastore.put(e);
-				    	}
-						
-						
+				    	}	
 					}
 					//Save Resource update time into the datestore
 					Entity e = new Entity("lastRuntime", slug);
@@ -329,10 +326,10 @@ public class CaptionsServlet extends HttpServlet {
 
 	      // Add the completed snippet object to the caption resource.
 	      captionObjectDefiningMetadata.setSnippet(snippet);
-	      
 	      // Create an object that contains the caption file's contents.
-	      InputStreamContent mediaContent = new InputStreamContent( "*/*", new BufferedInputStream(new ByteArrayInputStream(captionContent.getBytes("UTF-8"))));
-	      mediaContent.setLength(captionContent.length());
+	      byte[] bytes = captionContent.getBytes("UTF-8");
+	      InputStreamContent mediaContent = new InputStreamContent( "*/*", new BufferedInputStream(new ByteArrayInputStream(bytes)));
+	      mediaContent.setLength(bytes.length);
 	      
 	      // Create an API request that specifies that the mediaContent
 	      // object is the caption of the specified video.
@@ -363,8 +360,9 @@ public class CaptionsServlet extends HttpServlet {
 	    updateCaption.setSnippet(updateCaptionSnippet);  
 
 	    // Create an object that contains the caption file's contents.
-	    InputStreamContent mediaContent = new InputStreamContent( "*/*", new BufferedInputStream(new ByteArrayInputStream(captionContent.getBytes("UTF-8"))));
-	    mediaContent.setLength(captionContent.length());
+	    byte[] bytes = captionContent.getBytes("UTF-8");
+	    InputStreamContent mediaContent = new InputStreamContent( "*/*", new BufferedInputStream(new ByteArrayInputStream(bytes)));
+	    mediaContent.setLength(bytes.length);
 
         // Create an API request that specifies that the mediaContent
         // object is the caption of the specified video.

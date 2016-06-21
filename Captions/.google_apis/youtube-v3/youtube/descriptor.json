@@ -1,45 +1,45 @@
 {
-  "discoveryLink": "./apis/youtube/v3/rest", 
   "kind": "discovery#directoryItem", 
-  "description": "Programmatic access to YouTube features.", 
-  "title": "YouTube Data API", 
-  "discoveryRestUrl": "https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest", 
-  "preferred": true, 
-  "version": "v3", 
-  "icons": {
-    "x32": "https://www.google.com/images/icons/product/youtube-32.png", 
-    "x16": "https://www.google.com/images/icons/product/youtube-16.png"
-  }, 
-  "documentationLink": "https://developers.google.com/youtube/v3", 
   "id": "youtube:v3", 
   "name": "youtube", 
+  "version": "v3", 
+  "title": "YouTube Data API", 
+  "description": "Supports core YouTube features, such as uploading videos, creating and managing playlists, searching for content, and much more.", 
+  "discoveryRestUrl": "https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest", 
+  "discoveryLink": "./apis/youtube/v3/rest", 
+  "icons": {
+    "x16": "https://www.google.com/images/icons/product/youtube-16.png", 
+    "x32": "https://www.google.com/images/icons/product/youtube-32.png"
+  }, 
+  "documentationLink": "https://developers.google.com/youtube/v3", 
+  "preferred": true, 
   "packagePath": null, 
   "canonicalName": "YouTube", 
   "files": [
     {
-      "downloadUrl": "/downloads/youtube/v3/143/java/1.18.0-rc/google-api-services-youtube-v3-rev143-1.18.0-rc.jar", 
-      "path": "google-api-services-youtube-v3-rev143-1.18.0-rc.jar", 
+      "downloadUrl": "/downloads/youtube/v3/176/java/1.18.0-rc/google-api-services-youtube-v3-rev176-1.18.0-rc.jar", 
+      "path": "google-api-services-youtube-v3-rev176-1.18.0-rc.jar", 
       "type": "binary", 
-      "timestamp": "2015-07-31 03:05"
+      "timestamp": "2016-06-16 01:44"
     }, 
     {
-      "downloadUrl": "/downloads/youtube/v3/143/java/1.18.0-rc/google-api-services-youtube-v3-rev143-1.18.0-rc-javadoc.jar", 
-      "path": "google-api-services-youtube-v3-rev143-1.18.0-rc-javadoc.jar", 
+      "downloadUrl": "/downloads/youtube/v3/176/java/1.18.0-rc/google-api-services-youtube-v3-rev176-1.18.0-rc-javadoc.jar", 
+      "path": "google-api-services-youtube-v3-rev176-1.18.0-rc-javadoc.jar", 
       "type": "documentation", 
-      "timestamp": "2015-07-31 03:06"
+      "timestamp": "2016-06-16 01:44"
     }, 
     {
-      "downloadUrl": "/downloads/youtube/v3/143/java/1.18.0-rc/google-api-services-youtube-v3-rev143-1.18.0-rc-sources.jar", 
-      "path": "google-api-services-youtube-v3-rev143-1.18.0-rc-sources.jar", 
+      "downloadUrl": "/downloads/youtube/v3/176/java/1.18.0-rc/google-api-services-youtube-v3-rev176-1.18.0-rc-sources.jar", 
+      "path": "google-api-services-youtube-v3-rev176-1.18.0-rc-sources.jar", 
       "type": "source", 
-      "timestamp": "2015-07-31 03:48"
+      "timestamp": "2016-06-16 02:33"
     }, 
     {
-      "path": "google-api-services-youtube-v3-rev143-1.18.0-rc.jar.properties", 
+      "path": "google-api-services-youtube-v3-rev176-1.18.0-rc.jar.properties", 
       "type": "android.properties"
     }
   ], 
-  "revision": 143, 
+  "revision": 176, 
   "language": "java", 
   "language_version": "1.18.0-rc", 
   "dependencies": [
